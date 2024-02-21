@@ -30,6 +30,8 @@ class ApriltagDetector:
         points2d, point_ids = self.detector.process_image_m(rgb)
 
         T_cam_marker = self._estimate_pose(points2d, point_ids)
+        cv2.imshow("window", rgb[:, :, ::-1])
+        cv2.waitKey(1)
         if T_cam_marker is None:
             print("No marker detected")
             return None

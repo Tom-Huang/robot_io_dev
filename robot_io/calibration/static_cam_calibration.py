@@ -111,6 +111,28 @@ def load_recording(path):
     return tcp_poses, marker_poses
 
 
+def visualize_tcp_poses(robot, cam, T_cam_object,  tcp_poses):
+    """
+    Move robot to recorded poses and visualize the robot tcp coordinate axes.
+
+    Args:
+        robot: Robot interface
+        tcp_poses: Previously saved tcp poses as list of 4x4 matrices.
+    """
+
+    input("Robot will move to recorded poses. Press any key to continue.")
+    robot.move_to_neutral()
+    time.sleep(5)
+    robot.close_gripper(blocking=True)
+    for i in range(len(tcp_poses)):
+        target_pos, target_orn = matrix_to_pos_orn(tcp_poses[i])
+        robot.move_cart_pos_abs_ptp(target_pos, target_orn)
+        time.sleep(1.0)
+        #Append 1 to the target_pos to make it a 4 dimensional vector
+        target_pos = np.append(target_pos, 1)
+        visualize_frame_in_static_cam(cam, T_cam_object, tcp_poses[i], wait = False)  #target_pos
+
+
 @hydra.main(config_path="../conf")
 def main(cfg):
     """
@@ -123,6 +145,7 @@ def main(cfg):
     cam = hydra.utils.instantiate(cfg.cam)
     marker_detector = hydra.utils.instantiate(cfg.marker_detector, cam=cam)
     robot = hydra.utils.instantiate(cfg.robot)
+    cam_name_serial = f"{cam.name}_{cam.serial_number}"
     calib_poses_dir = Path(f"{robot.name}_{marker_detector.cam.name}_calib_poses")
 
     if cfg.record_new_poses:
@@ -133,8 +156,10 @@ def main(cfg):
     tcp_poses, marker_poses = detect_marker_from_trajectory(robot, tcp_poses, marker_detector, cfg)
 
     T_robot_cam = calibrate_static_cam_least_squares(tcp_poses, marker_poses)
-    save_calibration(robot.name, cam.name, "cam", "robot", T_robot_cam)
+    save_calibration(robot.name, cam_name_serial, "cam", "robot", T_robot_cam)
 
+    # this will move the robot to previously recorded poses and draw the robot tcp coordinate axes
+    visualize_tcp_poses(robot, cam, np.linalg.inv(T_robot_cam), tcp_poses[:5])
     # if calibration was successful, you should see the robot base coordinate axes at the right position.
     visualize_frame_in_static_cam(cam, np.linalg.inv(T_robot_cam))
 

@@ -1,3 +1,4 @@
+import time
 import cv2
 import numpy as np
 from numpy import dot, eye, zeros, outer
@@ -148,12 +149,22 @@ def calibrate_static_cam_least_squares(T_robot_tcp, T_cam_marker):
     return T_robot_cam
 
 
-def visualize_frame_in_static_cam(cam, T_cam_object):
+def visualize_frame_in_static_cam(cam, T_cam_object, object = np.array([0, 0, 0, 1]), wait = True):
 
-    object = np.array([0, 0, 0, 1])
-    x = np.array([0.1, 0, 0, 1])
-    y = np.array([0, 0.1, 0, 1])
-    z = np.array([0, 0, 0.1, 1])
+    #check if object is a matrix 4x4 or a vector 4x1
+    if object.shape == (4, 4):
+        origin = np.array([0, 0, 0, 1])
+        
+        x = object @ np.array([0.1, 0, 0, 1])
+        y = object @ np.array([0, 0.1, 0, 1])
+        z = object @ np.array([0, 0, 0.1, 1])
+        object = object @ origin
+
+    else:
+        #object = np.array([0, 0, 0, 1])
+        x = object + np.array([0.1, 0, 0, 0])
+        y = object + np.array([0, 0.1, 0, 0])
+        z = object + np.array([0, 0, 0.1, 0])
 
     object_cam = T_cam_object @ object
     x_cam = T_cam_object @ x
@@ -167,7 +178,10 @@ def visualize_frame_in_static_cam(cam, T_cam_object):
     cv2.line(rgb, cam.project(object_cam), cam.project(z_cam), color=(0,0, 255), thickness=3)
 
     cv2.imshow("object in cam", rgb[:, :, ::-1])
-    cv2.waitKey(0)
+    if wait:
+        cv2.waitKey(0)
+    else:
+        cv2.waitKey(1000)
 
 
 def save_calibration(robot_name, cam_name, frame_from, frame_to, data):

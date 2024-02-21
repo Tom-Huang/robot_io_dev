@@ -81,15 +81,21 @@ def main(cfg):
                             "aa": get_action,
                             "pa": get_action_pos_action}
 
+    import cv2
     for start_idx, end_idx in ep_start_end_ids:
         reset(env, cfg.load_dir, start_idx)
         frame = get_frame(cfg.load_dir, 0)
         # plt.imshow(frame["rgb_static"])
         # plt.show()
         for i in range(start_idx + 1, end_idx + 1):
-            action = get_relative_actions[cfg.rel_action_type](cfg.load_dir, i, use_rel_actions)
-            obs, _, _, _ = env.step(action)
-            env.render()
+            # action = get_relative_actions[cfg.rel_action_type](cfg.load_dir, i, use_rel_actions)
+            # obs, _, _, _ = env.step(action)
+            # env.render()
+            frame = get_frame(cfg.load_dir, i)
+            cv2.imshow("cam 2", frame["rgb_static_2"])
+            k = cv2.waitKey(10)
+            if k == ord('q'):
+                break
 
 
 if __name__ == "__main__":

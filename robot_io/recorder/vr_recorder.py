@@ -112,6 +112,15 @@ class VrRecorder:
         self.current_episode_filenames = []
 
     def save(self, action, obs, done):
+        """
+        Save observation and action to file.
+        Args:
+            action: Action to save.
+            obs: Observation to save.
+            done: Whether the episode is done.
+        Returns:
+            None
+        """
         filename = f"frame_{self.save_frame_cnt:0{self.n_digits}d}.npz"
         self.current_episode_filenames.append(filename)
         self.save_frame_cnt += 1

@@ -32,6 +32,10 @@ class Realsense(Camera):
         # Configure depth and color streams
         self.pipeline = rs.pipeline()
         config = rs.config()
+        # device = rs.context().query_devices()
+        # device = device[0]
+        # self.serial_number = device.get_info(rs.camera_info.serial_number)
+        #print("serial number: ", self.serial_number)
         config.enable_stream(rs.stream.depth, resolution[0], resolution[1], rs.format.z16, fps)
         config.enable_stream(rs.stream.color, resolution[0], resolution[1], rs.format.rgb8, fps)
 

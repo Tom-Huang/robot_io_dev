@@ -12,7 +12,7 @@ hydra:
   run:
     dir: ${save_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
-save_dir: /tmp/test_record1
+save_dir: /tmp/
 env:
   freq: 30
   show_fps: false

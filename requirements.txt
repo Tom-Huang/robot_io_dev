@@ -14,4 +14,3 @@ gitpython
 pyttsx3
 Cython
 commentjson
-pygame

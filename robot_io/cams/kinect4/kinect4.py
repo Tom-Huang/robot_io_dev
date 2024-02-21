@@ -1,5 +1,5 @@
 import json
-
+from omegaconf import OmegaConf
 import open3d as o3d
 import numpy as np
 import cv2
@@ -10,6 +10,7 @@ from pathlib import Path
 from robot_io.cams.camera import Camera
 from contextlib import redirect_stdout
 import io
+import argparse
 
 
 class Kinect4(Camera):
@@ -22,28 +23,29 @@ class Kinect4(Camera):
                  crop_coords=None,
                  fps=30):
 
+
+        super().__init__(resolution=resolution, crop_coords=crop_coords, resize_resolution=resize_resolution,
+                         name="azure_kinect")
         config_path = "config/config_kinect4_{}.json".format(resolution)
         config = self.load_config_path(config_path)
-
+        print("device is: ", device)
         self.sensor = o3d.io.AzureKinectSensor(config)
         f = io.StringIO()
         with redirect_stdout(f):
             if not self.sensor.connect(device):
                 raise RuntimeError('Failed to connect to sensor')
         device_info = f.getvalue()
-        kinect_instance = self.get_kinect_instance(device_info)
-        params_file_path = "config/kinect4{}_params_{}.npz".format(kinect_instance, resolution)
-        resolution, data = self.load_config_data(params_file_path)
+        self.serial_number = self.get_kinect_serial_number(device_info)
+        data = self.load_config_data(self.serial_number, resolution)
+        
 
-        super().__init__(resolution=resolution, crop_coords=crop_coords, resize_resolution=resize_resolution,
-                         name="azure_kinect")
-        self.dist_coeffs = data['dist_coeffs']
-        self.camera_matrix = data['camera_matrix']
-        self.projection_matrix = data['projection_matrix']
-        self.intrinsics = data['intrinsics'].item()
+        #data = self.load_config_data(self.serial_number, resolution)
+        self.resize_resolution = resize_resolution
+
         self.intrinsics.update({"crop_coords": self.crop_coords,
                                 "resize_resolution": self.resize_resolution,
                                 "dist_coeffs": self.dist_coeffs})
+
         self.map1, self.map2 = cv2.initUndistortRectifyMap(self.camera_matrix, self.dist_coeffs, R=np.eye(3), \
                                                            newCameraMatrix=self.camera_matrix,
                                                            size=(self.intrinsics['width'], self.intrinsics['height']),
@@ -64,27 +66,42 @@ class Kinect4(Camera):
 
         return config
 
-    def load_config_data(self, params_file_path):
-        data = np.load((Path(__file__).parent / params_file_path).as_posix(), allow_pickle=True)
-        if "1080" in params_file_path:
-            resolution = (1920, 1080)
-        elif "720" in params_file_path:
-            resolution = (1280, 720)
-        else:
-            raise ValueError
-
-        return resolution, data
-
-    def get_kinect_instance(self, device_info):
+    def get_kinect_serial_number(self, device_info):
+        """Get the serial number of the kinect device"""
         serial_number = [int(s) for s in device_info.splitlines()[2].split() if s.isdigit()][0]
-        if serial_number == 232793712:
-            kinect_instance = 'a'
-        elif serial_number == 172402712:
-            kinect_instance = 'b'
-        else:
-            raise ValueError
+        return serial_number
 
-        return kinect_instance
+    def load_config_data(self, serial_number, resolution='1080p'):
+        """load the calibration parameters for the kinect device from yaml file"""
+        config_path = f"config/{serial_number}.yaml"
+        full_path = (Path(__file__).parent / config_path).as_posix()
+        conf = OmegaConf.to_container(OmegaConf.load(full_path)[resolution])
+        self.intrinsics = conf["intrinsics"]
+        self.resolution = (self.intrinsics["width"], self.intrinsics["height"])
+        # create the camera matrix from the intrinsics
+        self.camera_matrix = np.array([[self.intrinsics["fx"], 0, self.intrinsics["cx"]],
+                                  [0, self.intrinsics["fy"], self.intrinsics["cy"]],
+                                  [0, 0, 1]])
+
+        self.projection_matrix = np.array([[self.intrinsics["fx"], 0, self.intrinsics["cx"], 0],
+                                      [0, self.intrinsics["fy"], self.intrinsics["cy"], 0],
+                                      [0, 0, 1, 0]])
+
+        #convert the distortion coefficients to a numpy array
+        self.dist_coeffs = np.array(conf["dist_coeffs"])
+        self.crop_coords = None
+        if "crop_coords" in conf:
+            self.crop_coords = np.array(conf["crop_coords"])
+
+        # create the data dictionary
+        data = {'camera_matrix': self.camera_matrix,
+                'projection_matrix': self.projection_matrix,
+                'dist_coeffs': self.dist_coeffs,
+               'crop_coords': self.crop_coords,
+                'resolution': resolution,
+                'intrinsics': self.intrinsics}
+
+        return data
 
     def get_intrinsics(self):
         return self.intrinsics
@@ -111,8 +128,8 @@ class Kinect4(Camera):
         return rgb, depth
 
 
-def run_camera():
-    cam = Kinect4(0)
+def run_camera(device = 0, resolution = '1080p'):
+    cam = Kinect4(device=device, resolution=resolution)
     print(cam.get_intrinsics())
     while True:
         rgb, depth = cam.get_image()
@@ -122,4 +139,8 @@ def run_camera():
 
 
 if __name__ == "__main__":
-    run_camera()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--device', type=int, default=1, help='device number')
+    parser.add_argument('--resolution', type=str, default='1080p', help='resolution of the camera')
+    args = parser.parse_args()
+    run_camera(device=args.device, resolution=args.resolution)
