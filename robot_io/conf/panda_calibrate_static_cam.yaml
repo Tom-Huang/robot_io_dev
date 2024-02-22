@@ -1,4 +1,4 @@
-save_dir: ../calibration/calibration_files/
+save_dir: "${project_dir}/robot_io/calibration/calibration_files/"
 record_new_poses: false
 freq: 30
 
@@ -10,6 +10,7 @@ hydra:
     dir: ${save_dir}
 
 defaults:
+  - setup
   - robot: panda_frankx_interface_vr
   - input: vr_input
   - cams/static_cam@cam: kinect4_highres

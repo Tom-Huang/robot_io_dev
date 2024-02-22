@@ -142,11 +142,13 @@ def main(cfg):
     Args:
         cfg: Hydra config.
     """
+    cfg.cam.resize_resolution = None
+    cfg.cam.crop_coords = None
     cam = hydra.utils.instantiate(cfg.cam)
     marker_detector = hydra.utils.instantiate(cfg.marker_detector, cam=cam)
     robot = hydra.utils.instantiate(cfg.robot)
     cam_name_serial = f"{cam.name}_{cam.serial_number}"
-    calib_poses_dir = Path(f"{robot.name}_{marker_detector.cam.name}_calib_poses")
+    calib_poses_dir = Path(f"{robot.name}_{marker_detector.cam.name}_calib_poses_{cam.serial_number}")
 
     if cfg.record_new_poses:
         record_new_poses(robot, marker_detector, cfg, calib_poses_dir)

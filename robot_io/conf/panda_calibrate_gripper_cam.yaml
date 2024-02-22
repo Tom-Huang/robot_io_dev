@@ -1,14 +1,18 @@
-save_dir: ../calibration/calibration_files
+save_dir: "${project_dir}/robot_io/calibration/calibration_files"
 num_poses: 50
 marker_id: 11
 robot:
   use_impedance: false
+marker_detector:
+  marker_description: "./tags/marker_36h11b2_3x3x_3cm_two.json"
+
 
 hydra:
   run:
     dir: ${save_dir}
 
 defaults:
+  - setup
   - env: env
   - robot: panda_frankx_interface_policy
   - cams/gripper_cam@cam: framos_highres

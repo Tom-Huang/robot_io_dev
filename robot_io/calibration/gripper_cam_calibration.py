@@ -114,6 +114,8 @@ def main(cfg):
     Args:
         cfg: Hydra config.
     """
+    cfg.cam.resize_resolution = None
+    cfg.cam.crop_coords = None
     cam = hydra.utils.instantiate(cfg.cam)
     marker_detector = hydra.utils.instantiate(cfg.marker_detector, cam=cam)
     robot = hydra.utils.instantiate(cfg.robot)

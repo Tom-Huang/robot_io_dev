@@ -2,7 +2,7 @@ _target_: robot_io.cams.camera_manager.CameraManager
 _recursive_: false
 use_gripper_cam: false
 use_static_cam: true
-static_cam_count: 3
+static_cam_count: 2
 threaded_cameras: false
 defaults:
   - gripper_cam: framos

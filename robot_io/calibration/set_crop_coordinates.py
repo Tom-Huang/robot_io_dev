@@ -50,6 +50,9 @@ def set_crop_coordinates(cam, resolution=None):
 
 @hydra.main(config_path="../conf", config_name="set_crop_coordinates")
 def main(cfg):
+    cfg.cam.resize_resolution = None
+    cfg.cam.crop_coords = None
+    # Note: Comment out "crop_coords" in robot_io/cams/kinect4/config/{serial-number}.yaml
     cam = hydra.utils.instantiate(cfg.cam)
     set_crop_coordinates(cam, resolution=cfg.resolution)
 
