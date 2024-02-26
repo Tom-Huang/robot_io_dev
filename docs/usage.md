@@ -23,6 +23,7 @@
 - Get the intrinsics through running the viewer in the kinect4 directory
 - Add parameters to the a config file with the corressponding serial number in `robot_io/cams/kinect4/config`
 - Stick the marker to the robot end-effector
+- If applicable, comment out `crop_coords` in `robot_io/cams/kinect4/config/{serial-number}.yaml` 
 - Run `python robot_io/calibration/static_cam_calibration.py --config-name=[panda_calibrate_static_cam|iiwa_calibrate_static_cam]`
 - If you set `record_traj: true`, then you should use vr controller to move the robot. Press the record button (on top) to sample poses, and hold record button to finish the pose sampling.
 - If you set `record_traj: false` and `play_traj: true`, the robot will move to the previously recorded poses and captures the marker pose. This option is helpful in case the camera is moved slightly.

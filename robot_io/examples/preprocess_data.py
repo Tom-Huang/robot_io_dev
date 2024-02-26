@@ -201,7 +201,10 @@ def main(cfg):
     list_recording_dirs = listdirs(dataset_root)
     # now flatten list of lists
     print(list_recording_dirs)
-    recording_dirs = [item for sublist in list_recording_dirs for item in sublist]
+    if len(list_recording_dirs) == 1:
+        recording_dirs = list_recording_dirs
+    else:
+        recording_dirs = [item for sublist in list_recording_dirs for item in sublist]
     print("Found following subfolders containing recordings: ", recording_dirs)
     output_dir = Path(output_dir)
     if output_dir.exists():
