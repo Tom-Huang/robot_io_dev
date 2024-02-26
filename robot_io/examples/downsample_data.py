@@ -9,7 +9,7 @@ import numpy as np
 from omegaconf import OmegaConf
 from tqdm import tqdm
 
-from hulc2.utils.preprocess_real_data import compute_rel_action
+from robot_io.examples.preprocess_data import compute_rel_action
 
 
 def main():
@@ -60,13 +60,13 @@ def main():
                             episode_frames = {}
                         # Load following frames if they have not been loaded
                         if old_i - 1 not in episode_frames:
-                            aux_data = np.load(src_path / subdir / f"episode_{old_i - 1:06d}.npz")
+                            aux_data = np.load(src_path / subdir / f"episode_{old_i - 1:06d}.npz", allow_pickle=True)
                             episode_frames[old_i - 1] = dict(aux_data)
                         if old_i not in episode_frames:
-                            aux_data = np.load(src_path / subdir / f"episode_{old_i:06d}.npz")
+                            aux_data = np.load(src_path / subdir / f"episode_{old_i:06d}.npz", allow_pickle=True)
                             episode_frames[old_i] = dict(aux_data)
                         if old_i + 1 not in episode_frames:
-                            aux_data = np.load(src_path / subdir / f"episode_{old_i + 1:06d}.npz")
+                            aux_data = np.load(src_path / subdir / f"episode_{old_i + 1:06d}.npz", allow_pickle=True)
                             episode_frames[old_i + 1] = dict(aux_data)
 
                         # Get rel_action from current_state -> current_state + 2

@@ -57,6 +57,6 @@ $ python robot_io/examples/teleop_robot.py config-name=panda_teleop
 The robot will first move to its neutral position. Next, align the coordinate axes of the VR coordinate system and the robot base coordinate system:
 1. Press dead-man switch (button 8) on the *HTC VIVE* VR controller.
 2. Move controller in the direction of the positive x-axis of the robot base frame (typically forward from the robot's perspective).
-3. Push top middle button with three lines (button 1). 
+3. Push top middle button with three lines (button 1).
 
 Robot only moves with dead-man-switch pressed. If released, the controller can be moved around freely until the dead man's switch is pressed again.

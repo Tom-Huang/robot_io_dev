@@ -38,27 +38,10 @@ cd ../robot_io/cams/realsense
 python realsense.py  # test script
 ```
 - a) If `/usr/src/librealsense2` does not exist, download FRAMOS software package from https://www.framos.com/en/industrial-depth-cameras#downloads. Follow installation instructions, make sure to use local admin user (e.g. xam2) to install (file system may NOT be network mounted). Alternatively, `wget http://hulc2.cs.uni-freiburg.de/downloads/librealsense2.zip`.
-- b) Use Ethernet sockets on the ceiling for PoE. 
+- b) Use Ethernet sockets on the ceiling for PoE.
 
 
 # Robots
-
-## KUKA iiwa
-
-Clone Kuka Java Repository on aisgit
-```git clone https://aisgit.informatik.uni-freiburg.de/hermannl/kuka_java_interface_no_ros```
-
-`robot_io/robot_interface/iiwa_interface.py` is a ROS free python controller for KUKA iiwa. It sends UDP messages to the iiwa_java_controller.
-
-Supported control modes:
-- Joint position control
-    - degrees / radians
-- Cartesian position control
-    - PTP / LIN motions
-    - with / without impedance
-    - absolute / relative coordinates
-
-For more information please read README of [kuka_java_interface_no_ros](https://aisgit.informatik.uni-freiburg.de/hermannl/kuka_java_interface_no_ros)
 
 ## Franka Emika Panda
 
@@ -72,7 +55,7 @@ cp ../robot_io/misc/ik_fast_files/ikfast.h ./src/franka_panda/
 cp ../robot_io/misc/ik_fast_files/ikfast0x10000049.Transform6D.0_1_2_3_4_5_f6.cpp ./src/franka_panda/
 pip install .
 ```
-For creating different IK solutions (e.g. in case of a different gripper) please refer to: 
+For creating different IK solutions (e.g. in case of a different gripper) please refer to:
 `http://docs.ros.org/en/kinetic/api/framefab_irb6600_support/html/doc/ikfast_tutorial.html`
 
 ### Frankx
@@ -143,7 +126,7 @@ $ cd bullet3
 
 # Optional: patch bullet for selecting correct rendering device
 # (only relevant when using EGL and multi-gpu training)
-$ wget https://raw.githubusercontent.com/BlGene/bullet3/egl_remove_works/examples/OpenGLWindow/EGLOpenGLWindow.cpp -O examples/OpenGLWindow/EGLOpenGLWindow 
+$ wget https://raw.githubusercontent.com/BlGene/bullet3/egl_remove_works/examples/OpenGLWindow/EGLOpenGLWindow.cpp -O examples/OpenGLWindow/EGLOpenGLWindow
 
 # For building Bullet for VR  add -DUSE_OPENVR=ON to line 8 of build_cmake_pybullet_double.sh
 # Run
